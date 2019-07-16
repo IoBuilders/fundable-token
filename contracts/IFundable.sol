@@ -24,15 +24,21 @@ interface IFundable {
     function rejectFund(string calldata operationId, string calldata reason) external returns (bool);
     function isFundOperatorFor(address walletToFund, address orderer) external view returns (bool);
     function retrieveFundData(
-        address orderer,
         string calldata operationId
     ) external view returns (
+        address orderer,
         address walletToFund,
         uint256 value,
         string memory instructions,
         FundStatusCode status
     );
-    event FundOrdered(address indexed orderer, string indexed operationId, address indexed , uint256 value, string instructions);
+    event FundOrdered(
+        address indexed orderer,
+        string indexed operationId,
+        address indexed walletToFund,
+        uint256 value,
+        string instructions
+    );
     event FundInProcess(address indexed orderer, string indexed operationId);
     event FundExecuted(address indexed orderer, string indexed operationId);
     event FundRejected(address indexed orderer, string indexed operationId, string reason);

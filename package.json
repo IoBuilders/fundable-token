@@ -4,7 +4,7 @@
   "description": "An extension to the ERC-20 standard token that allows Token wallet owners to request a wallet to be funded, by calling the smart contract and attaching a fund instruction string.",
   "main": "truffle-config.js",
   "dependencies": {
-    "eip1996": "^1.0.3"
+    "openzeppelin-solidity": "^2.3.0"
   },
   "devDependencies": {
     "ethlint": "^1.2.4",
