@@ -34,15 +34,15 @@ interface IFundable {
     );
     event FundOrdered(
         address indexed orderer,
-        string indexed operationId,
+        string operationId,
         address indexed walletToFund,
         uint256 value,
         string instructions
     );
-    event FundInProcess(address indexed orderer, string indexed operationId);
-    event FundExecuted(address indexed orderer, string indexed operationId);
-    event FundRejected(address indexed orderer, string indexed operationId, string reason);
-    event FundCancelled(address indexed orderer, string indexed operationId);
+    event FundInProcess(address indexed orderer, string operationId);
+    event FundExecuted(address indexed orderer, string operationId);
+    event FundRejected(address indexed orderer, string operationId, string reason);
+    event FundCancelled(address indexed orderer, string operationId);
     event FundOperatorAuthorized(address indexed walletToFund, address indexed orderer);
     event FundOperatorRevoked(address indexed walletToFund, address indexed orderer);
 }

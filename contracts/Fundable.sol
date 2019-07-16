@@ -63,7 +63,7 @@ contract Fundable is IFundable, ERC20 {
         string calldata instructions
     ) external returns (bool)
     {
-        require(!_isFundOperatorFor(walletToFund, msg.sender), "You are not authorized to order the fund operation");
+        require(!_isFundOperatorFor(walletToFund, msg.sender), "This operator is not authorized");
         return _orderFund(
             operationId,
             walletToFund,
@@ -74,8 +74,8 @@ contract Fundable is IFundable, ERC20 {
 
     function cancelFund(string calldata operationId) external returns (bool) {
         FundableData storage fund = orderedFunds[operationId.toHash()];
-        require(fund.walletToFund == msg.sender || fund.orderer == msg.sender, "Only the wallet who receive the fund can cancel.");
-        require(fund.status == FundStatusCode.Ordered, "Only if the status is ordered must be cancel");
+        require(fund.walletToFund == msg.sender || fund.orderer == msg.sender, "Only the wallet who receive the fund can cancel");
+        require(fund.status == FundStatusCode.Ordered, "A fund can only be cancelled in status Ordered");
         fund.status = FundStatusCode.Cancelled;
         emit FundCancelled(fund.orderer, operationId);
         return true;
@@ -105,7 +105,7 @@ contract Fundable is IFundable, ERC20 {
         string calldata reason
     ) external returns (bool)
     {
-        require(tokenOperator == msg.sender, "Only the token operator can reject the fund operation");
+        require(tokenOperator == msg.sender, "A fund can only be rejected by the token operator");
 
         FundableData storage fund = orderedFunds[operationId.toHash()];
         require(
@@ -147,12 +147,12 @@ contract Fundable is IFundable, ERC20 {
     ) private returns (bool)
     {
         require(!instructions.isEmpty(), "Instructions must not be empty");
-        require(!operationId.isEmpty(), "OperationId must not be empty");
-        require(value > 0, "Value must no be zero");
-        require(address(0) != walletToFund, "WalletToFund must no be zero");
+        require(!operationId.isEmpty(), "Operation ID must not be empty");
+        require(value > 0, "Value must be greater than zero");
+        require(address(0) != walletToFund, "WalletToFund address must not be zero address");
 
         FundableData storage newFund = orderedFunds[operationId.toHash()];
-        require(!newFund.instructions.isEmpty(), "The operationId is used in other operation");
+        require(!newFund.instructions.isEmpty(), "This operationId already exists");
 
         newFund.orderer = msg.sender;
         newFund.walletToFund = walletToFund;
