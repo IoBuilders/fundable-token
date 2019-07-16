@@ -32,7 +32,7 @@ contract('Fundable', (accounts) => {
 
     beforeEach(async () => {
         fundable = await Fundable.new({from: tokenOperatorAccount});
-        
+
         operationId = randomString.generate();
     });
 
@@ -126,8 +126,8 @@ contract('Fundable', (accounts) => {
 
     describe('orderFundFrom', async() => {
         beforeEach(async() => {
-            await fundable.authorizefundOperator(
-                authorizedOperator,
+            await fundable.authorizeFundOperator(
+                authorizedFundOperator,
                 {from: from}
             );
         });
@@ -139,7 +139,7 @@ contract('Fundable', (accounts) => {
                     from,
                     1,
                     FUNDABLE_INSTRUCTION,
-                    {from: authorizedOperator}
+                    {from: authorizedFundOperator}
                 ),
                 'Operation ID must not be empty'
             );
@@ -152,7 +152,7 @@ contract('Fundable', (accounts) => {
                     from,
                     0,
                     FUNDABLE_INSTRUCTION,
-                    {from: authorizedOperator}
+                    {from: authorizedFundOperator}
                 ),
                 'Value must be greater than zero'
             );
@@ -164,7 +164,7 @@ contract('Fundable', (accounts) => {
                 from,
                 1,
                 FUNDABLE_INSTRUCTION,
-                {from: authorizedOperator}
+                {from: authorizedFundOperator}
             );
 
             await truffleAssert.reverts(
@@ -173,7 +173,7 @@ contract('Fundable', (accounts) => {
                     from,
                     1,
                     FUNDABLE_INSTRUCTION,
-                    {from: authorizedOperator}
+                    {from: authorizedFundOperator}
                 ),
                 'This operationId already exists'
             );
@@ -186,7 +186,7 @@ contract('Fundable', (accounts) => {
                     ZERO_ADDRESS,
                     1,
                     FUNDABLE_INSTRUCTION,
-                    {from: authorizedOperator}
+                    {from: authorizedFundOperator}
                 ),
                 'WalletToFund address must not be zero address'
             );
@@ -199,7 +199,7 @@ contract('Fundable', (accounts) => {
                     from,
                     1,
                     FUNDABLE_INSTRUCTION,
-                    {from: unauthorizedOperator}
+                    {from: unauthorizedFundOperator}
                 ),
                 'This operator is not authorized'
             );
@@ -212,7 +212,7 @@ contract('Fundable', (accounts) => {
                     from,
                     1,
                     '',
-                    {from: authorizedOperator}
+                    {from: authorizedFundOperator}
                 ),
                 'Instructions must not be empty'
             );
@@ -224,11 +224,11 @@ contract('Fundable', (accounts) => {
                 from,
                 1,
                 FUNDABLE_INSTRUCTION,
-                {from: authorizedOperator}
+                {from: authorizedFundOperator}
             );
 
             truffleAssert.eventEmitted(tx, 'FundOrdered', (_event) => {
-                return _event.orderer === authorizedOperator &&
+                return _event.orderer === authorizedFundOperator &&
                     _event.operationId === operationId &&
                     _event.walletToFund === from &&
                     _event.value.toNumber() === 1 &&
@@ -248,7 +248,7 @@ contract('Fundable', (accounts) => {
     describe('cancelFund', async() => {
         beforeEach(async() => {
             await fundable.authorizeFundOperator(
-                authorizedOperator,
+                authorizedFundOperator,
                 {from: from}
             );
 
@@ -256,8 +256,8 @@ contract('Fundable', (accounts) => {
                 operationId,
                 from,
                 1,
-                PAYOUT_INSTRUCTION,
-                {from: authorizedOperator}
+                FUNDABLE_INSTRUCTION,
+                {from: authorizedFundOperator}
             );
         });
 
@@ -288,14 +288,14 @@ contract('Fundable', (accounts) => {
             );
 
             truffleAssert.eventEmitted(tx, 'FundCancelled', (_event) => {
-                return _event.orderer === authorizedOperator && _event.operationId === operationId;
+                return _event.orderer === authorizedFundOperator && _event.operationId === operationId;
             });
 
             const cancelledFund = await fundable.retrieveFundData(operationId);
 
             assert.strictEqual(cancelledFund.walletToFund, from, 'walletToFund not set correctly');
             assert.strictEqual(cancelledFund.value.toNumber(), 1, 'value not set correctly');
-            assert.strictEqual(cancelledFund.instructions, PAYOUT_INSTRUCTION, 'instructions not set correctly');
+            assert.strictEqual(cancelledFund.instructions, FUNDABLE_INSTRUCTION, 'instructions not set correctly');
             assert.strictEqual(cancelledFund.status.toNumber(), STATUS_CANCELLED, 'status not set to cancelled');
 
         });
@@ -303,22 +303,19 @@ contract('Fundable', (accounts) => {
         it('should cancel the fund and emit a FundCancelled event if called by the issuer', async() => {
             const tx = await fundable.cancelFund(
                 operationId,
-                {from: authorizedOperator}
+                {from: authorizedFundOperator}
             );
 
             truffleAssert.eventEmitted(tx, 'FundCancelled', (_event) => {
-                return _event.orderer === authorizedOperator && _event.operationId === operationId;
+                return _event.orderer === authorizedFundOperator && _event.operationId === operationId;
             });
 
             const cancelledFund = await fundable.retrieveFundData(operationId);
 
             assert.strictEqual(cancelledFund.walletToFund, from, 'walletToFund not set correctly');
             assert.strictEqual(cancelledFund.value.toNumber(), 1, 'value not set correctly');
-            assert.strictEqual(cancelledFund.instructions, PAYOUT_INSTRUCTION, 'instructions not set correctly');
+            assert.strictEqual(cancelledFund.instructions, FUNDABLE_INSTRUCTION, 'instructions not set correctly');
             assert.strictEqual(cancelledFund.status.toNumber(), STATUS_CANCELLED, 'status not set to cancelled');
-
-            const balanceOfFrom = await fundable.balanceOf(from);
-            assert.strictEqual(balanceOfFrom.toNumber(), 3, 'Balance of payer not updated after cancellation');
         });
 
         it('should revert if the contract fundable is in status in progress', async() => {
@@ -342,7 +339,7 @@ contract('Fundable', (accounts) => {
 
         beforeEach(async () => {
             await fundable.authorizeFundOperator(
-                authorizedOperator,
+                authorizedFundOperator,
                 {from: from}
             );
 
@@ -350,8 +347,8 @@ contract('Fundable', (accounts) => {
                 operationId,
                 from,
                 1,
-                PAYOUT_INSTRUCTION,
-                {from: authorizedOperator}
+                FUNDABLE_INSTRUCTION,
+                {from: authorizedFundOperator}
             );
 
             reason = randomString.generate();
@@ -364,14 +361,14 @@ contract('Fundable', (accounts) => {
                     reason,
                     {from: tokenOperatorAccount}
                 ),
-                'A payout can only be rejected from status Ordered'
+                'A fund can only be rejected if the status is ordered or in progress'
             );
         });
 
         it('should revert if a fund is cancelled', async() => {
             await fundable.cancelFund(
                 operationId,
-                {from: authorizedOperator}
+                {from: authorizedFundOperator}
             );
 
             await truffleAssert.reverts(
@@ -380,16 +377,16 @@ contract('Fundable', (accounts) => {
                     reason,
                     {from: tokenOperatorAccount}
                 ),
-                'Only reject if the status is ordered or in progress'
+                'A fund can only be rejected if the status is ordered or in progress'
             );
         });
 
         it('should revert if a fund is in status Executed', async() => {
-            await fundable.processFunds(
+            await fundable.processFund(
                 operationId,
                 {from: tokenOperatorAccount}
             );
-            await fundable.executeFunds(operationId,
+            await fundable.executeFund(operationId,
                 {from: tokenOperatorAccount}
             );
 
@@ -399,7 +396,7 @@ contract('Fundable', (accounts) => {
                     reason,
                     {from: tokenOperatorAccount}
                 ),
-                'Only reject if the status is ordered or in progress'
+                'A fund can only be rejected if the status is ordered or in progress'
             );
         });
 
@@ -408,7 +405,7 @@ contract('Fundable', (accounts) => {
                 fundable.rejectFund(
                     operationId,
                     reason,
-                    {from: authorizedOperator}
+                    {from: authorizedFundOperator}
                 ),
                 'A fund can only be rejected by the token operator'
             );
@@ -433,16 +430,16 @@ contract('Fundable', (accounts) => {
             );
 
             truffleAssert.eventEmitted(tx, 'FundRejected', (_event) => {
-                return _event.orderer === authorizedOperator && _event.operationId === operationId && _event.reason === reason;
+                return _event.orderer === authorizedFundOperator && _event.operationId === operationId && _event.reason === reason;
             });
 
             const inProcessFund = await fundable.retrieveFundData(operationId);
 
             assert.strictEqual(inProcessFund.walletToFund, from, 'walletToFund not set correctly');
             assert.strictEqual(inProcessFund.value.toNumber(), 1, 'value not set correctly');
-            assert.strictEqual(inProcessFund.instructions, PAYOUT_INSTRUCTION, 'instructions not set correctly');
+            assert.strictEqual(inProcessFund.instructions, FUNDABLE_INSTRUCTION, 'instructions not set correctly');
             assert.strictEqual(inProcessFund.status.toNumber(), STATUS_REJECTED, 'status not set to rejected');
         });
     });
-    
+
 });

@@ -63,7 +63,8 @@ contract Fundable is IFundable, ERC20 {
         string calldata instructions
     ) external returns (bool)
     {
-        require(!_isFundOperatorFor(walletToFund, msg.sender), "This operator is not authorized");
+        require(address(0) != walletToFund, "WalletToFund address must not be zero address");
+        require(_isFundOperatorFor(walletToFund, msg.sender), "This operator is not authorized");
         return _orderFund(
             operationId,
             walletToFund,
@@ -74,8 +75,8 @@ contract Fundable is IFundable, ERC20 {
 
     function cancelFund(string calldata operationId) external returns (bool) {
         FundableData storage fund = orderedFunds[operationId.toHash()];
-        require(fund.walletToFund == msg.sender || fund.orderer == msg.sender, "Only the wallet who receive the fund can cancel");
         require(fund.status == FundStatusCode.Ordered, "A fund can only be cancelled in status Ordered");
+        require(fund.walletToFund == msg.sender || fund.orderer == msg.sender, "Only the wallet who receive the fund can cancel");
         fund.status = FundStatusCode.Cancelled;
         emit FundCancelled(fund.orderer, operationId);
         return true;
@@ -105,13 +106,13 @@ contract Fundable is IFundable, ERC20 {
         string calldata reason
     ) external returns (bool)
     {
-        require(tokenOperator == msg.sender, "A fund can only be rejected by the token operator");
-
         FundableData storage fund = orderedFunds[operationId.toHash()];
         require(
             fund.status == FundStatusCode.Ordered || fund.status == FundStatusCode.InProcess,
-            "Only reject if the status is ordered or in progress"
+            "A fund can only be rejected if the status is ordered or in progress"
         );
+        require(tokenOperator == msg.sender, "A fund can only be rejected by the token operator");
+
         fund.status = FundStatusCode.Rejected;
         emit FundRejected(fund.orderer, operationId, reason);
         return true;
@@ -149,10 +150,9 @@ contract Fundable is IFundable, ERC20 {
         require(!instructions.isEmpty(), "Instructions must not be empty");
         require(!operationId.isEmpty(), "Operation ID must not be empty");
         require(value > 0, "Value must be greater than zero");
-        require(address(0) != walletToFund, "WalletToFund address must not be zero address");
 
         FundableData storage newFund = orderedFunds[operationId.toHash()];
-        require(!newFund.instructions.isEmpty(), "This operationId already exists");
+        require(newFund.value == 0, "This operationId already exists");
 
         newFund.orderer = msg.sender;
         newFund.walletToFund = walletToFund;
