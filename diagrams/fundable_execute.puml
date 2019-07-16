@@ -3,7 +3,7 @@ UserA -> "Fundable Token": orderFund
 "Fundable Token" --> "Token Contract Operator": FundOrdered
 "Token Contract Operator" -> "Fundable Token": processFund
 "Fundable Token" --> "UserA": FundInProcess
-"userA funds" --> "Token Contract Operator":
+"userA funds" --> "Token Contract Operator": transfer funds
 "Token Contract Operator" -> "Fundable Token": executeFund
 "Fundable Token" --> UserA: FundExecuted
 @enduml
