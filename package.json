@@ -1,0 +1,41 @@
+{
+  "name": "eip2019",
+  "version": "1.0.0",
+  "description": "An extension to the ERC-20 standard token that allows Token wallet owners to request a wallet to be funded, by calling the smart contract and attaching a fund instruction string.",
+  "main": "truffle-config.js",
+  "dependencies": {
+    "eip1996": "^1.0.3"
+  },
+  "devDependencies": {
+    "ethlint": "^1.2.4",
+    "ganache-cli": "^6.4.5",
+    "randomstring": "^1.1.5",
+    "solc": "0.5.10",
+    "solidity-coverage": "^0.6.0",
+    "truffle": "^5.0.27",
+    "truffle-assertions": "^0.9.1"
+  },
+  "scripts": {
+    "coverage": "solidity-coverage",
+    "lint": "solium -d contracts --fix",
+    "test": "scripts/executeTests.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IoBuilders/fundable-token.git"
+  },
+  "keywords": [
+    "\"eip\"",
+    "\"erc\"",
+    "\"fundable\"",
+    "\"solidity\"",
+    "\"ethereum\"",
+    "\"eth\""
+  ],
+  "author": "tech@io.builders",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/IoBuilders/fundable-token/issues"
+  },
+  "homepage": "https://github.com/IoBuilders/fundable-token#readme"
+}
