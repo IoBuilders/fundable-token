@@ -1,0 +1,7 @@
+@startuml
+UserA -> "Fundable Token": orderFund
+"Fundable Token" --> "Token Contract Operator": FundOrdered
+
+UserA -> "Fundable Token": cancelFund
+"Fundable Token" --> "Token Contract Operator": FundCancelled
+@enduml

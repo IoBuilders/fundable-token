@@ -1,22 +1,12 @@
 @startuml
-scale 350 width
-[*] --> NotShooting
-
-state NotShooting {
-  [*] --> Idle
-  Idle --> Configuring : EvConfig
-  Configuring --> Idle : EvConfig
-}
-
-state Configuring {
-  [*] --> NewValueSelection
-  NewValueSelection --> NewValuePreview : EvNewValue
-  NewValuePreview --> NewValueSelection : EvNewValueRejected
-  NewValuePreview --> NewValueSelection : EvNewValueSaved
-
-  state NewValuePreview {
-     State1 -> State2
-  }
-
-}
+[*] --> Ordered: FundOrdered
+Ordered --> InProcess: FundInProcess
+Ordered: Tokens are pending to be processed by the token contract operator
+InProcess: The fund operation was started, but the tokens are not yet in the balance of the user
+InProcess --> Executed: FundExecuted
+Executed: The tokens are minted for the user (as it only called after the funds have been received)
+Ordered --> Cancelled: FundCancelled
+Cancelled: Can only be called by the user
+Ordered --> Rejected: FundRejected
+Rejected: Can only be called by the token contract operator
 @enduml
