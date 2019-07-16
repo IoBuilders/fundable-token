@@ -25,12 +25,12 @@
     "url": "git+https://github.com/IoBuilders/fundable-token.git"
   },
   "keywords": [
-    "\"eip\"",
-    "\"erc\"",
-    "\"fundable\"",
-    "\"solidity\"",
-    "\"ethereum\"",
-    "\"eth\""
+    "eip",
+    "erc",
+    "fundable",
+    "solidity",
+    "ethereum",
+    "eth"
   ],
   "author": "tech@io.builders",
   "license": "Apache-2.0",

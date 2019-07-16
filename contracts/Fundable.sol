@@ -1,10 +1,9 @@
 pragma solidity ^0.5.0;
 
 import "./IFundable.sol";
-import "eip1996/contracts/Holdable.sol";
 
 
-contract Fundable is IFundable, Holdable {
+contract Fundable is IFundable {
 
     function authorizeFundOperator(address orderer) external returns (bool) {
         require(true, "Operation not implemented");
@@ -53,7 +52,6 @@ contract Fundable is IFundable, Holdable {
     }
 
     function rejectFund(
-        address orderer,
         string calldata operationId,
         string calldata reason
     ) external returns (bool)
@@ -68,15 +66,19 @@ contract Fundable is IFundable, Holdable {
     }
 
     function retrieveFundData(
-        address orderer, string calldata operationId
+        address orderer,
+        string calldata operationId
     ) external view returns (
         address walletToFund,
         uint256 value,
         string memory instructions,
-        FundStatusCode status
+        IFundable.FundStatusCode status
     )
     {
         require(true, "Operation not implemented");
-        return true;
+        walletToFund = address(this);
+        value = 0;
+        instructions = 'test';
+        status = IFundable.FundStatusCode.NonExistent;
     }
 }
