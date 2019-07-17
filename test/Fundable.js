@@ -271,7 +271,7 @@ contract('Fundable', (accounts) => {
             );
         });
 
-        it('should revert if the contract payout agent calls it', async() => {
+        it('should revert if the contract fund operator calls it', async() => {
             await truffleAssert.reverts(
                 fundable.cancelFund(
                     operationId,
@@ -617,6 +617,50 @@ contract('Fundable', (accounts) => {
 
             const balanceOfWalletToFund = await fundable.balanceOf(from);
             assert.strictEqual(balanceOfWalletToFund.toNumber(), 1, 'Balance of wallet to fund not updated');
+        });
+    });
+
+    describe('authorizeFundOperator', async() => {
+        it('should authorize an operator and emit a FundOperatorAuthorized event', async() => {
+            const tx = await fundable.authorizeFundOperator(authorizedFundOperator, {from: from});
+
+            const isAuthorized = await fundable.isFundOperatorFor(authorizedFundOperator, from);
+            assert.strictEqual(isAuthorized, true, 'Operator has not been authorized');
+
+            truffleAssert.eventEmitted(tx, 'FundOperatorAuthorized', (_event) => {
+                return _event.orderer === authorizedFundOperator && _event.walletToFund === from;
+            });
+        });
+
+        it('should revert if an operator has already been authorized', async() => {
+            await fundable.authorizeFundOperator(authorizedFundOperator, {from: from});
+
+            await truffleAssert.reverts(
+                fundable.authorizeFundOperator(authorizedFundOperator, {from: from}),
+                'The operator is already authorized'
+            );
+        });
+    });
+
+    describe('revokeFundOperator', async() => {
+        it('should revert if an operator has not been authorized', async() => {
+            await truffleAssert.reverts(
+                fundable.revokeFundOperator(unauthorizedFundOperator, {from: from}),
+                'The operator is already not authorized'
+            );
+        });
+
+        it('should revoke the authorization of an operator and emit a FundOperatorRevoked event', async() => {
+            await fundable.authorizeFundOperator(unauthorizedFundOperator, {from: from});
+
+            const tx = await fundable.revokeFundOperator(unauthorizedFundOperator, {from: from});
+
+            const isAuthorized = await fundable.isFundOperatorFor(unauthorizedFundOperator, from);
+            assert.strictEqual(isAuthorized, false, 'Operator authorization has not been revoked');
+
+            truffleAssert.eventEmitted(tx, 'FundOperatorRevoked', (_event) => {
+                return _event.orderer === unauthorizedFundOperator && _event.walletToFund === from;
+            });
         });
     });
     

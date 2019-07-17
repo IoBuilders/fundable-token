@@ -30,7 +30,7 @@ contract Fundable is IFundable, ERC20 {
         require(fundOperators[msg.sender][orderer] == false, "The operator is already authorized");
 
         fundOperators[msg.sender][orderer] = true;
-        emit FundOperatorAuthorized(orderer, msg.sender);
+        emit FundOperatorAuthorized(msg.sender, orderer);
         return true;
     }
 
@@ -38,7 +38,7 @@ contract Fundable is IFundable, ERC20 {
         require(fundOperators[msg.sender][orderer], "The operator is already not authorized");
 
         fundOperators[msg.sender][orderer] = false;
-        emit FundOperatorRevoked(orderer, msg.sender);
+        emit FundOperatorRevoked(msg.sender, orderer);
         return true;
     }
 
@@ -64,7 +64,7 @@ contract Fundable is IFundable, ERC20 {
     ) external returns (bool)
     {
         require(address(0) != walletToFund, "WalletToFund address must not be zero address");
-        require(_isFundOperatorFor(walletToFund, msg.sender), "This operator is not authorized");
+        require(_isFundOperatorFor(msg.sender, walletToFund), "This operator is not authorized");
         return _orderFund(
             operationId,
             walletToFund,
@@ -171,7 +171,7 @@ contract Fundable is IFundable, ERC20 {
         return true;
     }
 
-    function _isFundOperatorFor(address walletToFund, address orderer) private view returns (bool) {
-        return fundOperators[walletToFund][orderer];
+    function _isFundOperatorFor(address operator, address from) private view returns (bool) {
+        return fundOperators[from][operator];
     }
 }
