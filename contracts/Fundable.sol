@@ -17,7 +17,7 @@ contract Fundable is IFundable, ERC20 {
     }
 
     address public tokenOperator;
-    // walletToFund -> autorized -> true/false
+    // walletToFund -> authorized -> true/false
     mapping(address => mapping(address => bool)) public fundOperators;
 
     mapping(bytes32 => FundableData) private orderedFunds;
@@ -76,7 +76,7 @@ contract Fundable is IFundable, ERC20 {
     function cancelFund(string calldata operationId) external returns (bool) {
         FundableData storage fund = orderedFunds[operationId.toHash()];
         require(fund.status == FundStatusCode.Ordered, "A fund can only be cancelled in status Ordered");
-        require(fund.walletToFund == msg.sender || fund.orderer == msg.sender, "Only the wallet who receive the fund can cancel");
+        require(fund.walletToFund == msg.sender || fund.orderer == msg.sender, "Only the wallet who receives the fund can cancel");
         fund.status = FundStatusCode.Cancelled;
         emit FundCancelled(fund.orderer, operationId);
         return true;
@@ -85,7 +85,7 @@ contract Fundable is IFundable, ERC20 {
     function processFund(string calldata operationId) external returns (bool) {
         require(tokenOperator == msg.sender, "A fund can only be processed by the fund operator");
         FundableData storage fund = orderedFunds[operationId.toHash()];
-        require(fund.status == FundStatusCode.Ordered, "Only process if the status is ordered");
+        require(fund.status == FundStatusCode.Ordered, "A fund can only be put in process from status Ordered");
         fund.status = FundStatusCode.InProcess;
         emit FundInProcess(fund.orderer, operationId);
         return true;
@@ -148,7 +148,7 @@ contract Fundable is IFundable, ERC20 {
     ) private returns (bool)
     {
         require(!instructions.isEmpty(), "Instructions must not be empty");
-        require(!operationId.isEmpty(), "Operation ID must not be empty");
+        require(!operationId.isEmpty(), "operationId must not be empty");
         require(value > 0, "Value must be greater than zero");
 
         FundableData storage newFund = orderedFunds[operationId.toHash()];

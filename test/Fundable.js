@@ -52,7 +52,7 @@ contract('Fundable', (accounts) => {
                     FUNDABLE_INSTRUCTION,
                     {from: from}
                 ),
-                'Operation ID must not be empty'
+                'operationId must not be empty'
             );
         });
 
@@ -141,7 +141,7 @@ contract('Fundable', (accounts) => {
                     FUNDABLE_INSTRUCTION,
                     {from: authorizedFundOperator}
                 ),
-                'Operation ID must not be empty'
+                'operationId must not be empty'
             );
         });
 
@@ -277,7 +277,7 @@ contract('Fundable', (accounts) => {
                     operationId,
                     {from: tokenOperatorAccount}
                 ),
-                'Only the wallet who receive the fund can cancel'
+                'Only the wallet who receives the fund can cancel'
             );
         });
 
@@ -464,7 +464,7 @@ contract('Fundable', (accounts) => {
                     randomString.generate(),
                     {from: tokenOperatorAccount}
                 ),
-                'Only process if the status is ordered'
+                ' A fund can only be put in process from status Ordered'
             );
         });
 
@@ -479,7 +479,7 @@ contract('Fundable', (accounts) => {
                     operationId,
                     {from: tokenOperatorAccount}
                 ),
-                'Only process if the status is ordered'
+                'A fund can only be put in process from status Ordered'
             );
         });
 
@@ -663,5 +663,5 @@ contract('Fundable', (accounts) => {
             });
         });
     });
-    
+
 });
