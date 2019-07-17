@@ -9,8 +9,8 @@ const FUNDABLE_INSTRUCTION = '{\n' +
     '    "funds": [\n' +
     '        {\n' +
     '            "amount": 1.00,\n' +
-    '            "bankAccountId": "caaa2bd3-dc42-436a-b70b-d1d7dac23741",\n' +
-    '            "remittanceInformation": "Example Remittance Information"\n' +
+    '            "fundSourceId": "caaa2bd3-dc42-436a-b70b-d1d7dac23741",\n' +
+    '            "receiverInformation": "Example funds receiver information"\n' +
     '        }\n' +
     '    ]\n' +
     '}';
