@@ -442,4 +442,182 @@ contract('Fundable', (accounts) => {
         });
     });
 
+    describe('processFund', async() => {
+        beforeEach(async() => {
+            await fundable.authorizeFundOperator(
+                authorizedFundOperator,
+                {from: from}
+            );
+
+            await fundable.orderFundFrom(
+                operationId,
+                from,
+                1,
+                FUNDABLE_INSTRUCTION,
+                {from: authorizedFundOperator}
+            );
+        });
+
+        it('should revert if a non existing operation id is used', async() => {
+            await truffleAssert.reverts(
+                fundable.processFund(
+                    randomString.generate(),
+                    {from: tokenOperatorAccount}
+                ),
+                'Only process if the status is ordered'
+            );
+        });
+
+        it('should revert if a fund is cancelled', async() => {
+            await fundable.cancelFund(
+                operationId,
+                {from: authorizedFundOperator}
+            );
+
+            await truffleAssert.reverts(
+                fundable.processFund(
+                    operationId,
+                    {from: tokenOperatorAccount}
+                ),
+                'Only process if the status is ordered'
+            );
+        });
+
+        it('should revert if called by the orderer', async() => {
+            await truffleAssert.reverts(
+                fundable.processFund(
+                    operationId,
+                    {from: authorizedFundOperator}
+                ),
+                'Only the token operator can process the fund operation'
+            );
+        });
+
+        it('should revert if called by walletToFund', async() => {
+            await truffleAssert.reverts(
+                fundable.processFund(
+                    operationId,
+                    {from: from}
+                ),
+                'Only the token operator can process the fund operation'
+            );
+        });
+
+        it('should set the fund to status InProcess and emit a FundInProcess event if called by the token operator', async() => {
+            const tx = await fundable.processFund(
+                operationId,
+                {from: tokenOperatorAccount}
+            );
+
+            truffleAssert.eventEmitted(tx, 'FundInProcess', (_event) => {
+                return _event.orderer === authorizedFundOperator && _event.operationId === operationId;
+            });
+
+            const inProcessFund = await fundable.retrieveFundData(operationId);
+
+            assert.strictEqual(inProcessFund.walletToFund, from, 'walletToFund not set correctly');
+            assert.strictEqual(inProcessFund.value.toNumber(), 1, 'value not set correctly');
+            assert.strictEqual(inProcessFund.instructions, FUNDABLE_INSTRUCTION, 'instructions not set correctly');
+            assert.strictEqual(inProcessFund.status.toNumber(), STATUS_IN_PROCESS, 'status not set to in process');
+        });
+    });
+
+    describe('executeFund', async() => {
+        beforeEach(async () => {
+            await fundable.authorizeFundOperator(
+                authorizeFundOperator,
+                {from: from}
+            );
+
+            await fundable.orderFund(
+                operationId,
+                from,
+                1,
+                FUNDABLE_INSTRUCTION,
+                {from: authorizeFundOperator}
+            );
+        });
+
+        it('should revert if a non existing operation id is used', async() => {
+            await truffleAssert.reverts(
+                fundable.executeFund(
+                    randomString.generate(),
+                    {from: tokenOperatorAccount}
+                ),
+                'A fund can only be executed from status InProcess'
+            );
+        });
+
+        it('should revert if a fund is cancelled', async() => {
+            await fundable.cancelFund(
+                operationId,
+                {from: authorizeFundOperator}
+            );
+
+            await truffleAssert.reverts(
+                fundable.executeFund(
+                    operationId,
+                    {from: tokenOperatorAccount}
+                ),
+                'A fund can only be executed from status InProcess'
+            );
+        });
+
+        it('should revert if called by the orderer', async() => {
+            await fundable.processFund(
+                operationId,
+                {from: tokenOperatorAccount}
+            );
+
+            await truffleAssert.reverts(
+                fundable.executeFund(
+                    operationId,
+                    {from: authorizeFundOperator}
+                ),
+                'A fund can only be executed by the fund operator'
+            );
+        });
+
+        it('should revert if called by walletToFund', async() => {
+            await fundable.processFund(
+                operationId,
+                {from: tokenOperatorAccount}
+            );
+
+            await truffleAssert.reverts(
+                fundable.executeFund(
+                    operationId,
+                    {from: from}
+                ),
+                'A fund can only be executed by the fund operator'
+            );
+        });
+
+        it('should mint the tokens to the wallet to fund account and emit a FundExecuted event if called by the topen operator', async() => {
+            await fundable.processFund(
+                operationId,
+                {from: tokenOperatorAccount}
+            );
+
+            const tx = await fundable.executeFund(
+                operationId,
+                {from: tokenOperatorAccount}
+            );
+
+            truffleAssert.eventEmitted(tx, 'FundExecuted', (_event) => {
+                return _event.orderer === authorizeFundOperator && _event.operationId === operationId;
+            });
+
+            const executedFund = await fundable.retrieveFundData(operationId);
+
+            assert.strictEqual(executedFund.walletToFund, from, 'walletToFund not set correctly');
+            assert.strictEqual(executedFund.value.toNumber(), 1, 'value not set correctly');
+            assert.strictEqual(executedFund.instructions, FUNDABLE_INSTRUCTION, 'instructions not set correctly');
+            assert.strictEqual(executedFund.status.toNumber(), STATUS_EXECUTED, 'status not set to executed');
+
+            const balanceOfWalletToFund = await fundable.balanceOf(from);
+            assert.strictEqual(balanceOfWalletToFund.toNumber(), 1, 'Balance of wallet to fund not updated');
+        });
+    });
+    
 });

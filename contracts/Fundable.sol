@@ -83,9 +83,9 @@ contract Fundable is IFundable, ERC20 {
     }
 
     function processFund(string calldata operationId) external returns (bool) {
-        require(tokenOperator == msg.sender, "Only the token operator can process the fund operation");
+        require(tokenOperator == msg.sender, "A fund can only be executed by the fund operator");
         FundableData storage fund = orderedFunds[operationId.toHash()];
-        require(fund.status == FundStatusCode.Ordered, "Only reject if the status is ordered");
+        require(fund.status == FundStatusCode.Ordered, "Only process if the status is ordered");
         fund.status = FundStatusCode.InProcess;
         emit FundInProcess(fund.orderer, operationId);
         return true;
@@ -94,7 +94,7 @@ contract Fundable is IFundable, ERC20 {
     function executeFund(string calldata operationId) external returns (bool) {
         require(tokenOperator == msg.sender, "Only the token operator can execute the fund operation");
         FundableData storage fund = orderedFunds[operationId.toHash()];
-        require(fund.status == FundStatusCode.InProcess, "Only execute if the status is in process");
+        require(fund.status == FundStatusCode.InProcess, "A fund can only be executed from status InProcess");
         fund.status = FundStatusCode.Executed;
         _mint(fund.walletToFund, fund.value);
         emit FundExecuted(fund.orderer, operationId);
