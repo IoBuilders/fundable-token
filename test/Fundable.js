@@ -489,7 +489,7 @@ contract('Fundable', (accounts) => {
                     operationId,
                     {from: authorizedFundOperator}
                 ),
-                'Only the token operator can process the fund operation'
+                'A fund can only be processed by the fund operator'
             );
         });
 
@@ -499,7 +499,7 @@ contract('Fundable', (accounts) => {
                     operationId,
                     {from: from}
                 ),
-                'Only the token operator can process the fund operation'
+                'A fund can only be processed by the fund operator'
             );
         });
 
@@ -525,16 +525,16 @@ contract('Fundable', (accounts) => {
     describe('executeFund', async() => {
         beforeEach(async () => {
             await fundable.authorizeFundOperator(
-                authorizeFundOperator,
+                authorizedFundOperator,
                 {from: from}
             );
 
-            await fundable.orderFund(
+            await fundable.orderFundFrom(
                 operationId,
                 from,
                 1,
                 FUNDABLE_INSTRUCTION,
-                {from: authorizeFundOperator}
+                {from: authorizedFundOperator}
             );
         });
 
@@ -551,7 +551,7 @@ contract('Fundable', (accounts) => {
         it('should revert if a fund is cancelled', async() => {
             await fundable.cancelFund(
                 operationId,
-                {from: authorizeFundOperator}
+                {from: authorizedFundOperator}
             );
 
             await truffleAssert.reverts(
@@ -572,7 +572,7 @@ contract('Fundable', (accounts) => {
             await truffleAssert.reverts(
                 fundable.executeFund(
                     operationId,
-                    {from: authorizeFundOperator}
+                    {from: authorizedFundOperator}
                 ),
                 'A fund can only be executed by the fund operator'
             );
@@ -605,7 +605,7 @@ contract('Fundable', (accounts) => {
             );
 
             truffleAssert.eventEmitted(tx, 'FundExecuted', (_event) => {
-                return _event.orderer === authorizeFundOperator && _event.operationId === operationId;
+                return _event.orderer === authorizedFundOperator && _event.operationId === operationId;
             });
 
             const executedFund = await fundable.retrieveFundData(operationId);
