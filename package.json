@@ -8,11 +8,11 @@
   },
   "devDependencies": {
     "ethlint": "^1.2.4",
-    "ganache-cli": "^6.4.5",
+    "ganache-cli": "^6.5.0",
     "randomstring": "^1.1.5",
     "solc": "0.5.10",
-    "solidity-coverage": "^0.6.0",
-    "truffle": "^5.0.27",
+    "solidity-coverage": "^0.6.3",
+    "truffle": "^5.0.28",
     "truffle-assertions": "^0.9.1"
   },
   "scripts": {

@@ -9,7 +9,7 @@ const FUNDABLE_INSTRUCTION = '{\n' +
     '    "funds": [\n' +
     '        {\n' +
     '            "amount": 1.00,\n' +
-    '            "fundSourceId": "caaa2bd3-dc42-436a-b70b-d1d7dac23741",\n' +
+    '            "fundingSubjectId": "caaa2bd3-dc42-436a-b70b-d1d7dac23741",\n' +
     '            "receiverInformation": "Example funds receiver information"\n' +
     '        }\n' +
     '    ]\n' +
@@ -25,22 +25,15 @@ contract('Fundable', (accounts) => {
     let fundable;
     let operationId;
 
-    const tokenOperatorAccount = accounts[0];
+    const fundAgent = accounts[0];
     const from = accounts[1];
     const authorizedFundOperator = accounts[2];
     const unauthorizedFundOperator = accounts[3];
 
     beforeEach(async () => {
-        fundable = await Fundable.new({from: tokenOperatorAccount});
+        fundable = await Fundable.new({from: fundAgent});
 
         operationId = randomString.generate();
-    });
-
-    describe('constructor', async() => {
-        it('should set the token operator account', async() => {
-            const tokenOperator = await fundable.tokenOperator();
-            assert.strictEqual(tokenOperator, tokenOperatorAccount, 'Token operator account not set correctly');
-        });
     });
 
     describe('orderFund', async() => {
@@ -275,7 +268,7 @@ contract('Fundable', (accounts) => {
             await truffleAssert.reverts(
                 fundable.cancelFund(
                     operationId,
-                    {from: tokenOperatorAccount}
+                    {from: fundAgent}
                 ),
                 'Only the wallet who receives the fund can cancel'
             );
@@ -359,7 +352,7 @@ contract('Fundable', (accounts) => {
                 fundable.rejectFund(
                     randomString.generate(),
                     reason,
-                    {from: tokenOperatorAccount}
+                    {from: fundAgent}
                 ),
                 'A fund can only be rejected if the status is ordered or in progress'
             );
@@ -375,7 +368,7 @@ contract('Fundable', (accounts) => {
                 fundable.rejectFund(
                     operationId,
                     reason,
-                    {from: tokenOperatorAccount}
+                    {from: fundAgent}
                 ),
                 'A fund can only be rejected if the status is ordered or in progress'
             );
@@ -384,17 +377,17 @@ contract('Fundable', (accounts) => {
         it('should revert if a fund is in status Executed', async() => {
             await fundable.processFund(
                 operationId,
-                {from: tokenOperatorAccount}
+                {from: fundAgent}
             );
             await fundable.executeFund(operationId,
-                {from: tokenOperatorAccount}
+                {from: fundAgent}
             );
 
             await truffleAssert.reverts(
                 fundable.rejectFund(
                     operationId,
                     reason,
-                    {from: tokenOperatorAccount}
+                    {from: fundAgent}
                 ),
                 'A fund can only be rejected if the status is ordered or in progress'
             );
@@ -407,7 +400,7 @@ contract('Fundable', (accounts) => {
                     reason,
                     {from: authorizedFundOperator}
                 ),
-                'A fund can only be rejected by the token operator'
+                'FundAgentRole: caller is not a fund agent'
             );
         });
 
@@ -418,15 +411,15 @@ contract('Fundable', (accounts) => {
                     reason,
                     {from: from}
                 ),
-                'A fund can only be rejected by the token operator'
+                'FundAgentRole: caller is not a fund agent'
             );
         });
 
-        it('should set the fund to status Rejected and emit a FundRejected event if called by the token operator', async() => {
+        it('should set the fund to status Rejected and emit a FundRejected event if called by a fund agent', async() => {
             const tx = await fundable.rejectFund(
                 operationId,
                 reason,
-                {from: tokenOperatorAccount}
+                {from: fundAgent}
             );
 
             truffleAssert.eventEmitted(tx, 'FundRejected', (_event) => {
@@ -462,7 +455,7 @@ contract('Fundable', (accounts) => {
             await truffleAssert.reverts(
                 fundable.processFund(
                     randomString.generate(),
-                    {from: tokenOperatorAccount}
+                    {from: fundAgent}
                 ),
                 ' A fund can only be put in process from status Ordered'
             );
@@ -477,7 +470,7 @@ contract('Fundable', (accounts) => {
             await truffleAssert.reverts(
                 fundable.processFund(
                     operationId,
-                    {from: tokenOperatorAccount}
+                    {from: fundAgent}
                 ),
                 'A fund can only be put in process from status Ordered'
             );
@@ -489,7 +482,7 @@ contract('Fundable', (accounts) => {
                     operationId,
                     {from: authorizedFundOperator}
                 ),
-                'A fund can only be processed by the fund operator'
+                'FundAgentRole: caller is not a fund agent'
             );
         });
 
@@ -499,14 +492,14 @@ contract('Fundable', (accounts) => {
                     operationId,
                     {from: from}
                 ),
-                'A fund can only be processed by the fund operator'
+                'FundAgentRole: caller is not a fund agent'
             );
         });
 
-        it('should set the fund to status InProcess and emit a FundInProcess event if called by the token operator', async() => {
+        it('should set the fund to status InProcess and emit a FundInProcess event if called by a fund agent', async() => {
             const tx = await fundable.processFund(
                 operationId,
-                {from: tokenOperatorAccount}
+                {from: fundAgent}
             );
 
             truffleAssert.eventEmitted(tx, 'FundInProcess', (_event) => {
@@ -542,7 +535,7 @@ contract('Fundable', (accounts) => {
             await truffleAssert.reverts(
                 fundable.executeFund(
                     randomString.generate(),
-                    {from: tokenOperatorAccount}
+                    {from: fundAgent}
                 ),
                 'A fund can only be executed from status InProcess'
             );
@@ -557,7 +550,7 @@ contract('Fundable', (accounts) => {
             await truffleAssert.reverts(
                 fundable.executeFund(
                     operationId,
-                    {from: tokenOperatorAccount}
+                    {from: fundAgent}
                 ),
                 'A fund can only be executed from status InProcess'
             );
@@ -566,7 +559,7 @@ contract('Fundable', (accounts) => {
         it('should revert if called by the orderer', async() => {
             await fundable.processFund(
                 operationId,
-                {from: tokenOperatorAccount}
+                {from: fundAgent}
             );
 
             await truffleAssert.reverts(
@@ -574,14 +567,14 @@ contract('Fundable', (accounts) => {
                     operationId,
                     {from: authorizedFundOperator}
                 ),
-                'A fund can only be executed by the fund operator'
+                'FundAgentRole: caller is not a fund agent'
             );
         });
 
         it('should revert if called by walletToFund', async() => {
             await fundable.processFund(
                 operationId,
-                {from: tokenOperatorAccount}
+                {from: fundAgent}
             );
 
             await truffleAssert.reverts(
@@ -589,19 +582,19 @@ contract('Fundable', (accounts) => {
                     operationId,
                     {from: from}
                 ),
-                'A fund can only be executed by the fund operator'
+                'FundAgentRole: caller is not a fund agent'
             );
         });
 
         it('should mint the tokens to the wallet to fund account and emit a FundExecuted event if called by the topen operator', async() => {
             await fundable.processFund(
                 operationId,
-                {from: tokenOperatorAccount}
+                {from: fundAgent}
             );
 
             const tx = await fundable.executeFund(
                 operationId,
-                {from: tokenOperatorAccount}
+                {from: fundAgent}
             );
 
             truffleAssert.eventEmitted(tx, 'FundExecuted', (_event) => {

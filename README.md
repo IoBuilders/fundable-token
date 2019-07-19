@@ -24,23 +24,23 @@ In general, it is not advisable to place explicit routing instructions for debit
 
 The following diagram shows the sequence of the payout creation and execution.
 
-![Fundable Token: Fund executed](http://www.plantuml.com/plantuml/png/bP0nhi8m44HxdsALFXVunLSG0eag57004qyQmZhQNKiS7pkcGWH4PutVQ9wsK_DYwJQviq8srFvJiqyS_6K2dU8LtFnHb00fgNlzexOKbZTj8vlumQYV8TwYv6R1-z96SAlO-z5PuW3L3xEByNFamCVAkoQLcCOSwbU_7B2Ea8h_geWxXcHOLrmCg-2kii5ru93l_G00)
+![Fundable Token: Fund executed](http://www.plantuml.com/plantuml/png/ZP0n3i8m34NtdCBgtWime7O0YGa6E41eVXae3h8JYUFJr7H11NNCz_FFanjDNb9-3EwYa9RgBLNxpC5V1z0vti7LXg84I4dTzupgUO7Q6pYDS7aSom8CdoVBrK-97LJ_b4zUdzu3dunt5bC_XhfaaSIpzX0ZLeZWXIud_1QPFZIDdR71DU1GRlS6)
 
 ### Fund cancelled
 
 The following diagram shows the sequence of the payout creation and cancellation.
 
-![Fundable Token: Fund cancelled](http://www.plantuml.com/plantuml/png/SoWkIImgAStDuGejJYroLD2rKr1oAyrBIKpAILK8oSzEpLEoKiWlIaaj0eboeSifw88qWDaAplbv9KM9oIKA_WMfHOab-KL0dI3b_Y3TgIbS-6n8JinBJiqXsmfdiFOSe2KEgNafGDy00000)
+![Fundable Token: Fund cancelled](http://www.plantuml.com/plantuml/png/SoWkIImgAStDuGejJYroLD2rKr1oAyrBIKpAILK8oSzEpLEoKiWlIaaj0eboeSifwC8qA3Ycf-QL01M3EFuW3Qaf-CnCJinBJiqXnL1di8uSeB4EgNaf82S30000)
 
 ### Fund rejected
 
 The following diagram shows the sequence of the payout creation and rejection.
 
-![Fundable Token: Fund rejected](http://www.plantuml.com/plantuml/png/SoWkIImgAStDuGejJYroLD2rKr1oAyrBIKpAILK8oSzEpLEoKiWlIaaj0eboeSifw88qWDaAplbv9KM9oIKA_WMfHOab-KL0dI3b_Y3TgIbSN3ZLORUrA3KhDRa4ZxLW5qCj2G8h1jhYa9gN0lGE0000)
+![Fundable Token: Fund rejected](http://www.plantuml.com/plantuml/png/SoWkIImgAStDuGejJYroLD2rKr1oAyrBIKpAILK8oSzEpLEoKiWlIaaj0eboeSifwC8qA3Ycf-QL01M3EFuW3QaWvGWPx4ONfMQb9fVWCHliBAYnGM35G7CTKlDIG6u60000)
 
 ## State diagram
 
-![Fundable: State Diagram](http://www.plantuml.com/plantuml/png/TP71JiGm34Jl-Oev8_O7EA2L44YSG6XlY4EQk518xLNY2FhtjDscAK8zLMDFvzdECQcDcljWNg_US3ZSuYbwYkHly93PBy8itzdmoCzH7ALqiQpIh7-Uv8iumKR2cTXt_0uLDAEwECcZ6Q0V19sSSC8QhLF8cQ9LYMR3E8ssTkGipKuOtpPXdflyDPgi9Qf0MHG3AJgUEuqDbXr1sbdcH1l0lDBz3xciPUcYJ2sV_WBwZiSoMearSNkYkuaNGWbSfQcDoGFXCA0XE1j2FSg_k1Vw9BUELzHsXtrJBUy3zrxXIEnp7tu1)
+![Fundable: State Diagram](http://www.plantuml.com/plantuml/png/VL51JiGm3Bpd5ND6x0Sue9KGI9n0g3V48KtSfP2rLuaZwEzfqsspArMSeh77C_PadzH6pSTWtcy-iDlTuoLwYkJly9JPdu4vluNmpAzH7AKqKrPerib6leaJR2ISY7tF1wYW7T7C98zsW4KtZiCUYDLSY3QVD7VaHD5gBumVcr0M9N-BDYjqv6XrOL4CfEYvT5eRB3k2T0NcHB4Qb1iUVybbNQvSaAdbvjhWsFDOHYUnAbvcyZ3vXR08hj3KniI1S1Yc89mDeQImBVT6N-JMzHPKR_YFLClRXbUnxudzzFb_)
 
 ## Install
 
@@ -76,7 +76,7 @@ The unit tests use a JSON version of this standard, which can be seem below.
     "funds": [
         {
             "amount": 1.00,
-            "fundSourceId": "caaa2bd3-dc42-436a-b70b-d1d7dac23741",
+            "fundingSubjectId": "caaa2bd3-dc42-436a-b70b-d1d7dac23741",
             "receiverInformation": "Example funds receiver information"
         }
     ]
