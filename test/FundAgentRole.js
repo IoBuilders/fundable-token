@@ -28,7 +28,7 @@ contract('FundAgentRole', (accounts) => {
         });
     });
 
-    describe('addFundAgent', async() => {
+    describe('removeFundAgent', async() => {
         it('should remove an account as fund agent', async() => {
             await fundable.addFundAgent(fundAgent);
             await fundable.removeFundAgent(fundAgent);
