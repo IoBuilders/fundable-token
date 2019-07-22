@@ -1,0 +1,6 @@
+@startuml
+UserA -> "Fundable Token": orderFund
+"Fundable Token" --> "Fund Agent": FundOrdered
+UserA -> "Fundable Token": cancelFund
+"Fundable Token" --> "Fund Agent": FundCancelled
+@enduml

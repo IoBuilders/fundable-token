@@ -1,0 +1,13 @@
+@startuml
+[*] --> Ordered: FundOrdered
+Ordered --> InProcess: FundInProcess
+Ordered: Tokens are pending to be processed by a fund agent
+InProcess: The fund operation was started, but the tokens are not yet in the balance of the user
+InProcess --> Executed: FundExecuted
+Executed: The tokens are minted for the user
+Ordered --> Cancelled: FundCancelled
+Cancelled: Can only be called by the user
+Ordered --> Rejected: FundRejected
+InProcess --> Rejected: FundRejected
+Rejected: Can only be called by a fund agent
+@enduml
